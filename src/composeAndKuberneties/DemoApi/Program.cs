@@ -1,5 +1,6 @@
 using System;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
 namespace DemoApi
@@ -21,6 +22,16 @@ namespace DemoApi
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration((h, c) =>
+                {
+                    var envName = h.HostingEnvironment?.EnvironmentName ?? "Development";
+
+                    Console.WriteLine($"Enviroment:{envName}");
+
+                    c.AddJsonFile("appsettings.json")
+                        .AddJsonFile($"appsettings.{envName}.json")
+                        .AddEnvironmentVariables();
+                })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
