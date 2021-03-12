@@ -6,12 +6,16 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=https://+:443;http://+:80
       - MONGO_URI=mongodb://mongoPlay:mongoPlay@mongo/MongoPlay
+      - RABBIT_URI=amqp://guest:guest@rabbit:5672
     ports:
       - "8080:80"
       - "4443:443"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    depends_on:
+      - mongo
+      - rabbit
   mongo:
     image: mongo
     restart: always
@@ -20,3 +24,9 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: admin   
     ports:
      - 27017:27017  
+  rabbit:
+    image: rabbitmq:3-management
+    restart: always
+    ports:
+      - "8888:15672"  
+      - "5672" 
