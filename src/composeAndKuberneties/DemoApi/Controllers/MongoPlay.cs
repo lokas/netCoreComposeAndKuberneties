@@ -3,6 +3,8 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace DemoApi.Controllers
 {
@@ -36,21 +38,18 @@ namespace DemoApi.Controllers
                 _logger.LogCritical("Missing mongoURI");
                 throw new MongoConfigurationException("URI -> NOT SET");
             }
-            return new MongoClient()
-                .GetDatabase("MongoPlay")
-                .GetCollection<DummyClass>("HowMuchDummy");
+
+            return new MongoClient(new MongoUrl(uri))
+               .GetDatabase("MongoPlay")
+               .GetCollection<DummyClass>("HowMuchDummy");
         }
 
         public class DummyClass
         {
-            public DummyClass()
-            {
-                Info = "Info_" + Guid.NewGuid();
-                Details = "Details_" + Guid.NewGuid();
-            }
-
-            public string Info { get; }
-            public string Details { get; }
+            [BsonId]
+            public ObjectId Key { get; set; }
+            public string Info { get; set; }
+            public string Details { get; set; }
         }
 
         // POST api/<MongoPlay>
@@ -58,7 +57,12 @@ namespace DemoApi.Controllers
         public void Post()
         {
             var collection = GetCollection();
-            collection.InsertOne(new DummyClass());
+            var id = Guid.NewGuid();
+            collection.InsertOne(new DummyClass
+            {
+                Info = "Info_" + id,
+                Details = "Details_" + id
+            });
         }
     }
 }
