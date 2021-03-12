@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
 
 namespace DemoApi.Controllers
 {
@@ -31,13 +31,7 @@ namespace DemoApi.Controllers
 
         private IMongoCollection<DummyClass> GetCollection()
         {
-            var uri = Environment.GetEnvironmentVariable("MONGO_URI");
-            _logger.LogInformation($"Mongo Uri: {uri}");
-            if (string.IsNullOrEmpty(uri))
-            {
-                _logger.LogCritical("Missing mongoURI");
-                throw new MongoConfigurationException("URI -> NOT SET");
-            }
+            var uri = EnvVariable.GetValue(EnvVariable.Mongo, _logger);
 
             return new MongoClient(new MongoUrl(uri))
                .GetDatabase("MongoPlay")
