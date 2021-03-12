@@ -1,0 +1,22 @@
+version: '3.4'
+
+services:
+  demoapi:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - MONGO_URI=mongodb://mongoPlay:mongoPlay@mongo/MongoPlay
+    ports:
+      - "8080:80"
+      - "4443:443"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin   
+    ports:
+     - 27017:27017  
