@@ -1,0 +1,89 @@
+{
+	"info": {
+		"_postman_id": "4792d000-3431-45a3-ade2-5c9ca7d0335d",
+		"name": "CoreApiDocker",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "MongoGet",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:4443/api/MongoPlay",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "4443",
+					"path": [
+						"api",
+						"MongoPlay"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "MongoPost",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:4443/api/MongoPlay",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "4443",
+					"path": [
+						"api",
+						"MongoPlay"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "RabbitPost",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:4443/api/RabbitPlay",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "4443",
+					"path": [
+						"api",
+						"RabbitPlay"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "RabbitGet",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:4443/api/RabbitPlay",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "4443",
+					"path": [
+						"api",
+						"RabbitPlay"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
