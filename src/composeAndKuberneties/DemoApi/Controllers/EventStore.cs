@@ -96,16 +96,14 @@ namespace DemoApi.Controllers
                 data: Encoding.UTF8.GetBytes(JsonSerializer.Serialize(b)),
                 metadata: Encoding.UTF8.GetBytes("{}"));
             var uri = new Uri(EnvVariable.GetValue(EnvVariable.EventStore, _logger));
-            //var settings = ConnectionSettings.Create().KeepReconnecting()
             var consetting = ConnectionSettings.Create().DisableTls().Build();
             using var conn = EventStoreConnection.Create(consetting, uri);
-        //    var conn = EventStoreConnection.Create(uri);
+            //    var conn = EventStoreConnection.Create(uri);
             conn.Connected += Conn_Connected;
             conn.AuthenticationFailed += Conn_AuthenticationFailed;
             conn.Closed += Conn_Closed;
             await conn.ConnectAsync();
 
-          //  await Task.Delay(1000);
 
             var resA = await conn.AppendToStreamAsync(TypeA.StreamName, ExpectedVersion.Any, eventPayloadA);
             var resB = await conn.AppendToStreamAsync(TypeB.StreamName, ExpectedVersion.Any, eventPayloadB);
