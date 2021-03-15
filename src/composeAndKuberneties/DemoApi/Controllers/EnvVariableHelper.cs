@@ -7,6 +7,8 @@ namespace DemoApi.Controllers
     {
         public const string Mongo = "MONGO_URI";
         public const string Rabbit = "RABBIT_URI";
+        public const string EventStore = "EVENT_STORE_URI";
+
         public static string GetValue(string key, ILogger logger)
         {
             var uri = Environment.GetEnvironmentVariable(key);
