@@ -7,6 +7,7 @@ services:
       - ASPNETCORE_URLS=https://+:443;http://+:80
       - MONGO_URI=mongodb://mongoPlay:mongoPlay@mongo/MongoPlay
       - RABBIT_URI=amqp://guest:guest@rabbit:5672
+      - EVENT_STORE_URI=tcp://admin:changeit@eventstore:1113
     ports:
       - "8080:80"
       - "4443:443"
@@ -16,6 +17,7 @@ services:
     depends_on:
       - mongo
       - rabbit
+      - eventstore
   mongo:
     image: mongo
     restart: always
@@ -29,4 +31,20 @@ services:
     restart: always
     ports:
       - "8888:15672"  
-      - "5672" 
+      - "9672:5672" 
+  eventstore:
+    container_name: esdb-docs-v5
+    image: eventstore/eventstore:release-5.0.8
+    command: --insecure  --enable-external-tcp --ext-ip=0.0.0.0 --int-ip=0.0.0.0 --disable-external-tcp-tls
+    ports:
+      - '2113:2113'
+      - '1113:1113'
+    environment:      
+      EVENTSTORE_EXT_HTTP_PORT: 2113
+      EVENTSTORE_EXT_TCP_PORT: 1113
+      EVENTSTORE_RUN_PROJECTIONS: all
+      EVENTSTORE_START_STANDARD_PROJECTIONS: 'true'
+      PROJECTION_THREADS: 8
+      #EVENTSTORE_CLUSTER_SIZE: 1
+      #EVENTSTORE_DEV: 'true'
+    restart: always
