@@ -3,10 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using SharpCompress.Archives;
+using DemoApi.Domain;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -23,62 +24,57 @@ namespace DemoApi.Controllers
             _logger = logger;
         }
 
-        // GET: api/<EventStore>
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new[] { "value1", "value2" };
-        }
+        //create projection 
+        //create 
 
         // GET: api/<EventStore>
         [HttpGet]
-        public IEnumerable<string> Get(string typeStream)
+        public async Task<OkObjectResult> Get([FromQuery] string typeStream)
         {
-            return new[] { "value1", "value2" };
+            return typeStream switch
+            {
+                nameof(TypeA) => Ok(await GetEvents<TypeA>(TypeA.StreamName)),
+                nameof(TypeB) => Ok(await GetEvents<TypeB>(TypeB.StreamName)),
+                _ => throw new InvalidOperationException($"Unknown type provided:{typeStream}")
+            };
+        }
+
+        private async Task<IEnumerable<T>> GetEvents<T>(string streamName)
+        {
+            var streamEvents = new List<ResolvedEvent>();
+            using var connection = GetEventStoreConnection;
+            await connection.ConnectAsync();
+
+            StreamEventsSlice currentSlice;
+            long nextSliceStart = StreamPosition.Start;
+            do
+            {
+                currentSlice = await connection.ReadStreamEventsForwardAsync(
+                    streamName, nextSliceStart, 200, false);
+
+                nextSliceStart = currentSlice.NextEventNumber;
+
+                streamEvents.AddRange(currentSlice.Events);
+
+            } while (!currentSlice.IsEndOfStream);
+
+            return streamEvents
+                .Select(e => JsonSerializer.Deserialize<T>(e.Event.Data));
         }
 
 
-        public class TypeA
+        private IEventStoreConnection GetEventStoreConnection
         {
-            public Guid Id { get; set; }
-            public string PhoneInfo { get; set; }
-
-            public static TypeA Create
+            get
             {
-                get
-                {
-                    Guid g = Guid.NewGuid();
-                    return new TypeA
-                    {
-                        Id = g,
-                        PhoneInfo = $"PhoneInfo_{g}"
-                    };
-                }
-            }
-
-            public const string StreamName = nameof(TypeA) + "_Aggregate";
-        }
-
-        public class TypeB
-        {
-            public Guid Id { get; set; }
-            public string Name { get; set; }
-            public string Last { get; set; }
-
-            public const string StreamName = nameof(TypeB) + "_Aggregate";
-
-            public static TypeB Create
-            {
-                get
-                {
-                    Guid g = Guid.NewGuid();
-                    return new TypeB
-                    {
-                        Id = g,
-                        Name = $"Name_{g}",
-                        Last = $"Last_{g}"
-                    };
-                }
+                //    var conn = EventStoreConnection.Create(uri); bug on local host with tls
+                var uri = new Uri(EnvVariable.GetValue(EnvVariable.EventStore, _logger));
+                var settings = ConnectionSettings.Create().DisableTls().Build();
+                var con = EventStoreConnection.Create(settings, uri);
+                con.Connected += Conn_Connected;
+                con.AuthenticationFailed += Conn_AuthenticationFailed;
+                con.Closed += Conn_Closed;
+                return con;
             }
         }
 
@@ -95,13 +91,9 @@ namespace DemoApi.Controllers
             var eventPayloadB = new EventData(eventId: b.Id, type: nameof(TypeB), isJson: true,
                 data: Encoding.UTF8.GetBytes(JsonSerializer.Serialize(b)),
                 metadata: Encoding.UTF8.GetBytes("{}"));
-            var uri = new Uri(EnvVariable.GetValue(EnvVariable.EventStore, _logger));
-            var consetting = ConnectionSettings.Create().DisableTls().Build();
-            using var conn = EventStoreConnection.Create(consetting, uri);
-            //    var conn = EventStoreConnection.Create(uri);
-            conn.Connected += Conn_Connected;
-            conn.AuthenticationFailed += Conn_AuthenticationFailed;
-            conn.Closed += Conn_Closed;
+
+            using var conn = GetEventStoreConnection;
+          
             await conn.ConnectAsync();
 
 
@@ -121,7 +113,6 @@ namespace DemoApi.Controllers
         private void Conn_AuthenticationFailed(object sender, ClientAuthenticationFailedEventArgs e)
         {
             _logger.LogInformation("AuthenticationFailed!");
-
         }
 
         private void Conn_Connected(object sender, ClientConnectionEventArgs e)

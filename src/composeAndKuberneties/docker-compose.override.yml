@@ -31,7 +31,7 @@ services:
     restart: always
     ports:
       - "8888:15672"  
-      - "5672" 
+      - "9672:5672" 
   eventstore:
     container_name: esdb-docs-v5
     image: eventstore/eventstore:release-5.0.8
