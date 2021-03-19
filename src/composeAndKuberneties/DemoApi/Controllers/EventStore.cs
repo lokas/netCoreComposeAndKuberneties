@@ -1,4 +1,5 @@
-﻿using EventStore.ClientAPI;
+﻿using DemoApi.Domain;
+using EventStore.ClientAPI;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -7,7 +8,6 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using DemoApi.Domain;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -24,22 +24,16 @@ namespace DemoApi.Controllers
             _logger = logger;
         }
 
-        //create projection 
-        //create 
+        //create projection -> so we do have server side and client side (catch-up and persisten stream subscriptions)   
 
         // GET: api/<EventStore>
         [HttpGet]
-        public async Task<OkObjectResult> Get([FromQuery] string typeStream)
+        public async Task<OkObjectResult> Get([FromQuery] Guid id)
         {
-            return typeStream switch
-            {
-                nameof(TypeA) => Ok(await GetEvents<TypeA>(TypeA.StreamName)),
-                nameof(TypeB) => Ok(await GetEvents<TypeB>(TypeB.StreamName)),
-                _ => throw new InvalidOperationException($"Unknown type provided:{typeStream}")
-            };
+            return Ok(await GetEvents($"{nameof(Aggregate)}-{id}"));
         }
 
-        private async Task<IEnumerable<T>> GetEvents<T>(string streamName)
+        private async Task<IEnumerable<object>> GetEvents(string streamName)
         {
             var streamEvents = new List<ResolvedEvent>();
             using var connection = GetEventStoreConnection;
@@ -59,7 +53,8 @@ namespace DemoApi.Controllers
             } while (!currentSlice.IsEndOfStream);
 
             return streamEvents
-                .Select(e => JsonSerializer.Deserialize<T>(e.Event.Data));
+                .Select(e => Newtonsoft.Json.JsonConvert.DeserializeObject(
+                     UTF8Encoding.UTF8.GetString(e.Event.Data), Type.GetType(e.Event.EventType)));
         }
 
 
@@ -67,7 +62,7 @@ namespace DemoApi.Controllers
         {
             get
             {
-                //    var conn = EventStoreConnection.Create(uri); bug on local host with tls
+                //    var conn = EventStoreConnection.Create(uri); not working on local host with tls
                 var uri = new Uri(EnvVariable.GetValue(EnvVariable.EventStore, _logger));
                 var settings = ConnectionSettings.Create().DisableTls().Build();
                 var con = EventStoreConnection.Create(settings, uri);
@@ -78,31 +73,80 @@ namespace DemoApi.Controllers
             }
         }
 
-        // POST api/<EventStore>
-        [HttpPost]
-        public async Task Post()
+        public class PostData
         {
-            var a = TypeA.Create;
-            var eventPayloadA = new EventData(eventId: a.Id, type: nameof(TypeA), isJson: true,
-                data: Encoding.UTF8.GetBytes(JsonSerializer.Serialize(a)),
-                metadata: Encoding.UTF8.GetBytes("{}"));
+            public Guid Id { get; set; }
+        }
 
-            var b = TypeB.Create;
-            var eventPayloadB = new EventData(eventId: b.Id, type: nameof(TypeB), isJson: true,
-                data: Encoding.UTF8.GetBytes(JsonSerializer.Serialize(b)),
-                metadata: Encoding.UTF8.GetBytes("{}"));
+        [HttpPut]
+        public async Task Put()
+        {
+            var agr = new Aggregate();
+            var seed = Guid.NewGuid();
+            agr.AddPhoneInfo($"PhoneInfo_{seed}");
+            agr.AddPersonalDetails($"Name_{seed}", $"lastName_{seed}");
+            List<EventData> eventData = new List<EventData>();
+            //how we ensure version here 
+
+            agr.Internals(events =>
+            {
+                var x = JsonSerializer.Serialize(events[0], Type.GetType(events[0].GetType().FullName));
+
+                eventData.AddRange(
+                    events
+                        .Select(@event =>
+                            new EventData(eventId: @event.Id,
+                                type: @event.GetType().FullName,
+                                isJson: true,
+                                data: Encoding.UTF8.GetBytes(JsonSerializer.Serialize(@event,@event.GetType())),
+                                metadata: Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new { AggregateId = agr.Id, Version = "?" })))
+                        ));
+            });
+
 
             using var conn = GetEventStoreConnection;
-          
             await conn.ConnectAsync();
 
+            var streamName = $"{nameof(Aggregate)}-{agr.Id}";
+            var resA = await conn.AppendToStreamAsync(streamName, ExpectedVersion.Any, eventData);
 
-            var resA = await conn.AppendToStreamAsync(TypeA.StreamName, ExpectedVersion.Any, eventPayloadA);
-            var resB = await conn.AppendToStreamAsync(TypeB.StreamName, ExpectedVersion.Any, eventPayloadB);
+            _logger.LogInformation($"Event data stored for:{agr.Id}");
+        }
 
-            _logger.LogInformation($"Info written to stream A:{resA} and B:{resB}");
-            _logger.LogInformation($"Log info A:{resA.LogPosition} and B:{resB.LogPosition}");
-            _logger.LogInformation($"Next versions A:{resA.NextExpectedVersion} and B:{resB.NextExpectedVersion}");
+
+        // POST api/<EventStore>
+        [HttpPost]
+        public async Task Post([FromBody] PostData data = null)
+        {
+            var agr = new Aggregate();
+            var seed = Guid.NewGuid();
+            agr.AddPhoneInfo($"PhoneInfo_{seed}");
+            agr.AddPersonalDetails($"Name_{seed}", $"lastName_{seed}");
+            List<EventData> eventData = new List<EventData>();
+            //how we ensure version here 
+
+            agr.Internals(events =>
+            {
+                var x = JsonSerializer.Serialize(events[0], Type.GetType(events[0].GetType().FullName));
+                eventData.AddRange(
+                    events
+                        .Select(@event =>
+                        new EventData(eventId: @event.Id,
+                            type: @event.GetType().FullName,
+                            isJson: true,
+                            data: Encoding.UTF8.GetBytes(JsonSerializer.Serialize(@event, Type.GetType(@event.GetType().FullName))),
+                            metadata: Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new { AggregateId = agr.Id, Version = "?" })))
+                    ));
+            });
+
+
+            using var conn = GetEventStoreConnection;
+            await conn.ConnectAsync();
+
+            var streamName = $"{nameof(Aggregate)}-{agr.Id}";
+            var resA = await conn.AppendToStreamAsync(streamName, ExpectedVersion.Any, eventData);
+
+            _logger.LogInformation($"Event data stored for:{agr.Id}");
         }
 
         private void Conn_Closed(object sender, ClientClosedEventArgs e)
