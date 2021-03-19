@@ -5,7 +5,6 @@ namespace DemoApi.Domain
 {
     public class Aggregate
     {
-        private readonly Guid _id;
         private readonly AggregateState _state;
 
         private List<Event> _events = new List<Event>();
@@ -25,17 +24,17 @@ namespace DemoApi.Domain
 
         public Aggregate(Guid id, AggregateState state)
         {
-            _id = id;
+            Id = id;
             _state = state;
         }
 
-        public readonly Guid Id;
+        public Guid Id { get; }
 
         public void AddPhoneInfo(string phoneInfo)
         {
             if (phoneInfo.Equals(_state.PhoneInfo))
                 return;
-            
+
             if (string.IsNullOrEmpty(_state.PhoneInfo))
                 _events.Add(new PhoneInfoCreated(phoneInfo));
             else

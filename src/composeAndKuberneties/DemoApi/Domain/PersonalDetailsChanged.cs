@@ -2,12 +2,13 @@
 {
     public class PersonalDetailsChanged : Event
     {
-        public PersonalDetailsChanged(string name, string lastName)
+        public string Name { get; }
+        public string Last { get; }
+
+        public PersonalDetailsChanged(string name, string last)
         {
             Name = name;
-            Last = lastName;
+            Last = last;
         }
-        public readonly string Name;
-        public readonly string Last;
     }
 }
