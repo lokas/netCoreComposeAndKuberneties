@@ -4,8 +4,11 @@ namespace DemoApi.Domain
 {
     public abstract class Event
     {
-        protected Event()
+        public Guid AggregateId { get; }
+
+        protected Event(Guid aggregateId)
         {
+            AggregateId = aggregateId;
             Id = Guid.NewGuid();
         }
 

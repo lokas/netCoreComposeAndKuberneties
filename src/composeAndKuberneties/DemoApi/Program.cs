@@ -1,6 +1,8 @@
 using System;
+using DemoApi.BackGroundServices;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace DemoApi
@@ -35,6 +37,10 @@ namespace DemoApi
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                })
+                .ConfigureServices(services =>
+                {
+                    services.AddHostedService<StoredProjectionListeners>();
                 });
     }
 }

@@ -29,7 +29,7 @@ namespace DemoApi.Controllers
         [HttpGet]
         public async Task<OkObjectResult> Get([FromQuery] Guid id)
         {
-            return Ok(await GetEvents($"{nameof(Aggregate)}-{id}"));
+            return Ok(await GetEvents($"{nameof(PersonaDetail)}-{id}"));
         }
 
         private async Task<IEnumerable<object>> GetEvents(string streamName)
@@ -139,7 +139,7 @@ namespace DemoApi.Controllers
         [HttpPut]
         public async Task Put()
         {
-            var agr = new Aggregate();
+            var agr = new PersonaDetail();
             var seed = Guid.NewGuid();
             agr.AddPhoneInfo($"PhoneInfo_{seed}");
             agr.AddPersonalDetails($"Name_{seed}", $"lastName_{seed}");
@@ -147,7 +147,7 @@ namespace DemoApi.Controllers
             await AppendEvents(agr);
         }
 
-        private async Task AppendEvents(Aggregate agr)
+        private async Task AppendEvents(PersonaDetail agr)
         {
             List<EventData> eventData = new List<EventData>();
 
@@ -169,7 +169,7 @@ namespace DemoApi.Controllers
             using var conn = GetEventStoreConnection;
             await conn.ConnectAsync();
 
-            var streamName = $"{nameof(Aggregate)}-{agr.Id}";
+            var streamName = $"{nameof(PersonaDetail)}-{agr.Id}";
             var resA = await conn.AppendToStreamAsync(streamName, ExpectedVersion.Any, eventData);
 
             _logger.LogInformation($"Event data stored for:{agr.Id}");
@@ -182,9 +182,9 @@ namespace DemoApi.Controllers
         {
             if (data == null)
                 return BadRequest("No data id!");
-            var stream = $"{nameof(Aggregate)}-{data.Id}";
+            var stream = $"{nameof(PersonaDetail)}-{data.Id}";
 
-            var agr = new Aggregate(data.Id, await GetState(stream));
+            var agr = new PersonaDetail(data.Id, await GetState(stream));
 
             var seed = Guid.NewGuid();
             agr.AddPhoneInfo($"PhoneInfo_{seed}");
