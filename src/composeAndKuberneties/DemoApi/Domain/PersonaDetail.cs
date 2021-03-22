@@ -3,14 +3,13 @@ using System.Collections.Generic;
 
 namespace DemoApi.Domain
 {
-    public class Aggregate
+    public class PersonaDetail
     {
-        private readonly Guid _id;
         private readonly AggregateState _state;
 
         private List<Event> _events = new List<Event>();
 
-        public Aggregate(Guid? id = null)
+        public PersonaDetail(Guid? id = null)
         {
             Id = id ?? Guid.NewGuid();
             _state = new AggregateState
@@ -22,24 +21,23 @@ namespace DemoApi.Domain
         }
 
         //TODO: how to pass version for expected version
-
-        public Aggregate(Guid id, AggregateState state)
+        public PersonaDetail(Guid id, AggregateState state)
         {
-            _id = id;
+            Id = id;
             _state = state;
         }
 
-        public readonly Guid Id;
+        public Guid Id { get; }
 
         public void AddPhoneInfo(string phoneInfo)
         {
             if (phoneInfo.Equals(_state.PhoneInfo))
                 return;
-            
+
             if (string.IsNullOrEmpty(_state.PhoneInfo))
-                _events.Add(new PhoneInfoCreated(phoneInfo));
+                _events.Add(new PhoneInfoCreated(phoneInfo, Id));
             else
-                _events.Add(new PhoneInfoChanged(phoneInfo));
+                _events.Add(new PhoneInfoChanged(phoneInfo, Id));
 
             _state.PhoneInfo = phoneInfo;
         }
@@ -50,9 +48,9 @@ namespace DemoApi.Domain
                 return;
 
             if (string.IsNullOrEmpty(_state.Name))
-                _events.Add(new PersonalDetailsCreated(name, lastName));
+                _events.Add(new PersonalDetailsCreated(name, lastName, Id));
             else
-                _events.Add(new PersonalDetailsChanged(name, lastName));
+                _events.Add(new PersonalDetailsChanged(name, lastName, Id));
 
             _state.LastName = lastName;
             _state.Name = name;

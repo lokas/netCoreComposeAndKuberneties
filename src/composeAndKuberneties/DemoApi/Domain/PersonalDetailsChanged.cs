@@ -1,13 +1,16 @@
-﻿namespace DemoApi.Domain
+﻿using System;
+
+namespace DemoApi.Domain
 {
     public class PersonalDetailsChanged : Event
     {
-        public PersonalDetailsChanged(string name, string lastName)
+        public string Name { get; }
+        public string Last { get; }
+
+        public PersonalDetailsChanged(string name, string last,Guid aggregateId) : base(aggregateId)
         {
             Name = name;
-            Last = lastName;
+            Last = last;
         }
-        public readonly string Name;
-        public readonly string Last;
     }
 }

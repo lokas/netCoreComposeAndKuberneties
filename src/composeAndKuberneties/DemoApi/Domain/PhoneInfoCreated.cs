@@ -1,10 +1,10 @@
-﻿using Newtonsoft.Json;
+﻿using System;
 
 namespace DemoApi.Domain
 {
     public class PhoneInfoCreated : Event
     {
-        public PhoneInfoCreated(string phoneInfo)  
+        public PhoneInfoCreated(string phoneInfo, Guid aggregateId) : base(aggregateId)
         {
             PhoneInfo = phoneInfo;
         }
