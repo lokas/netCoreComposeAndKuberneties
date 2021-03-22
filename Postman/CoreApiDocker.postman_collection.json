@@ -84,6 +84,72 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "EventStorePost",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:4443/api/EventStore",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "4443",
+					"path": [
+						"api",
+						"EventStore"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "EventStoreGetAggregateEvents",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:4443/api/EventStore?typeStream=TypeA",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "4443",
+					"path": [
+						"api",
+						"EventStore"
+					],
+					"query": [
+						{
+							"key": "typeStream",
+							"value": "TypeA"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "EventStoreCreateRandom_Put",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:4443/api/EventStore",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "4443",
+					"path": [
+						"api",
+						"EventStore"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }
