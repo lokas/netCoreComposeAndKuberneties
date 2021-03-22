@@ -90,6 +90,15 @@
 			"request": {
 				"method": "POST",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
 					"raw": "https://localhost:4443/api/EventStore",
 					"protocol": "https",
@@ -136,6 +145,15 @@
 			"request": {
 				"method": "PUT",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Id\":\"5981aa1c-2a66-4dea-9d1f-556548868942\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
 					"raw": "https://localhost:4443/api/EventStore",
 					"protocol": "https",
