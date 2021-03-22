@@ -136,8 +136,8 @@ namespace DemoApi.Controllers
             public Guid Id { get; set; }
         }
 
-        [HttpPut]
-        public async Task Put()
+        [HttpPost]
+        public async Task Post()
         {
             var agr = new PersonaDetail();
             var seed = Guid.NewGuid();
@@ -177,8 +177,8 @@ namespace DemoApi.Controllers
 
 
         // POST api/<EventStore>
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] PostData data = null)
+        [HttpPut]
+        public async Task<IActionResult> Put([FromBody] PostData data = null)
         {
             if (data == null)
                 return BadRequest("No data id!");
