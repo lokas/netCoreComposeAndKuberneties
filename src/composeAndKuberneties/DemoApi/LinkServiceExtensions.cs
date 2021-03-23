@@ -1,6 +1,7 @@
 ﻿using DemoApi.RestHateos;
 using Microsoft.Extensions.DependencyInjection;
 using RiskFirst.Hateoas;
+using RiskFirst.Hateoas.Models;
 
 namespace DemoApi
 {
@@ -9,12 +10,26 @@ namespace DemoApi
         public static void SetupLinks(this IServiceCollection services)
         {
             services.AddLinks(c =>
-                c.AddPolicy<Customer>(
+            {
+                //   c.UseRelativeHrefs();
+
+                c.AddPolicy<Customer>(policy =>
+                {
+                    policy.RequireRoutedLink("self", "GetValueByIdRoute", x => new { id = x.Id });
+                });
+
+                c.AddPolicy<Customer>("FullInfoPolicy",
                     c => c
                         .RequireSelfLink()
-                        .RequireRoutedLink("all", "all", a => a.Id)));
+                        .RequireRoutedLink("create", "InsertValueRoute", a => a.Id)
+                        .RequireRoutedLink("all", "GetAllValuesRoute", a => a.Id));
 
-            //.RequireRoutedLink("all", "Customers")));
+                c.AddPolicy<ItemsLinkContainer<Customer>>(policy =>
+                {
+                    policy.RequireSelfLink(); //TODO: ask does this works?
+                    //.RequiresPagingLinks("me","next","previous");
+                });
+            });
         }
     }
 }
