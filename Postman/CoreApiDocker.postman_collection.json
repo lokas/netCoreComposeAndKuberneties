@@ -6,150 +6,308 @@
 	},
 	"item": [
 		{
-			"name": "MongoGet",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "https://localhost:4443/api/MongoPlay",
-					"protocol": "https",
-					"host": [
-						"localhost"
-					],
-					"port": "4443",
-					"path": [
-						"api",
-						"MongoPlay"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "MongoPost",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"url": {
-					"raw": "https://localhost:4443/api/MongoPlay",
-					"protocol": "https",
-					"host": [
-						"localhost"
-					],
-					"port": "4443",
-					"path": [
-						"api",
-						"MongoPlay"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "RabbitPost",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"url": {
-					"raw": "https://localhost:4443/api/RabbitPlay",
-					"protocol": "https",
-					"host": [
-						"localhost"
-					],
-					"port": "4443",
-					"path": [
-						"api",
-						"RabbitPlay"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "RabbitGet",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "https://localhost:4443/api/RabbitPlay",
-					"protocol": "https",
-					"host": [
-						"localhost"
-					],
-					"port": "4443",
-					"path": [
-						"api",
-						"RabbitPlay"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "EventStorePost",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"url": {
-					"raw": "https://localhost:4443/api/EventStore",
-					"protocol": "https",
-					"host": [
-						"localhost"
-					],
-					"port": "4443",
-					"path": [
-						"api",
-						"EventStore"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "EventStoreGetAggregateEvents",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "https://localhost:4443/api/EventStore?typeStream=TypeA",
-					"protocol": "https",
-					"host": [
-						"localhost"
-					],
-					"port": "4443",
-					"path": [
-						"api",
-						"EventStore"
-					],
-					"query": [
-						{
-							"key": "typeStream",
-							"value": "TypeA"
+			"name": "Hateos",
+			"item": [
+				{
+					"name": "api/Customers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:4443/api/Customers?skip=10",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "4443",
+							"path": [
+								"api",
+								"Customers"
+							],
+							"query": [
+								{
+									"key": "skip",
+									"value": "10"
+								}
+							]
 						}
-					]
+					},
+					"response": []
+				},
+				{
+					"name": "api/Customers/{id}",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:4443/api/Customers/6e24f2bc-a446-4967-8a33-0d6dbfa92e1f",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "4443",
+							"path": [
+								"api",
+								"Customers",
+								"6e24f2bc-a446-4967-8a33-0d6dbfa92e1f"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "api/Customers",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"TestName\",\r\n    \"lastname\":\"testLastName\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:4443/api/Customers",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "4443",
+							"path": [
+								"api",
+								"Customers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CustomerOrders",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"orderName\":\"SomeCrazyOrder\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:4443/api/Customers/9032d94f-972d-49c7-af1f-a8295687a873/Orders",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "4443",
+							"path": [
+								"api",
+								"Customers",
+								"9032d94f-972d-49c7-af1f-a8295687a873",
+								"Orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CustomerOrders",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:4443/api/Customers/9032d94f-972d-49c7-af1f-a8295687a873/Orders/bc023cfd-babf-42a1-a1b6-9e2186e104ce",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "4443",
+							"path": [
+								"api",
+								"Customers",
+								"9032d94f-972d-49c7-af1f-a8295687a873",
+								"Orders",
+								"bc023cfd-babf-42a1-a1b6-9e2186e104ce"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "EventStoreCreateRandom_Put",
-			"request": {
-				"method": "PUT",
-				"header": [],
-				"url": {
-					"raw": "https://localhost:4443/api/EventStore",
-					"protocol": "https",
-					"host": [
-						"localhost"
-					],
-					"port": "4443",
-					"path": [
-						"api",
-						"EventStore"
-					]
+			"name": "InfrastructurePlayground",
+			"item": [
+				{
+					"name": "MongoGet",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:4443/api/MongoPlay",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "4443",
+							"path": [
+								"api",
+								"MongoPlay"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "MongoPost",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:4443/api/MongoPlay",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "4443",
+							"path": [
+								"api",
+								"MongoPlay"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "RabbitPost",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:4443/api/RabbitPlay",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "4443",
+							"path": [
+								"api",
+								"RabbitPlay"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "EventStoreGetAggregateEvents",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:4443/api/EventStore?typeStream=TypeA",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "4443",
+							"path": [
+								"api",
+								"EventStore"
+							],
+							"query": [
+								{
+									"key": "typeStream",
+									"value": "TypeA"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "RabbitGet",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:4443/api/RabbitPlay",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "4443",
+							"path": [
+								"api",
+								"RabbitPlay"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "EventStorePost",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:4443/api/EventStore",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "4443",
+							"path": [
+								"api",
+								"EventStore"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "EventStoreCreateRandom_Put",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"Id\":\"5981aa1c-2a66-4dea-9d1f-556548868942\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:4443/api/EventStore",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "4443",
+							"path": [
+								"api",
+								"EventStore"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		}
 	]
 }
