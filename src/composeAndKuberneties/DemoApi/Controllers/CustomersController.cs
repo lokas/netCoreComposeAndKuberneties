@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 
 namespace DemoApi.Controllers
 {
-
     [Route("api/[controller]")]
     [ApiController]
     public class CustomersController : ControllerBase
@@ -25,7 +24,7 @@ namespace DemoApi.Controllers
         }
 
         // GET: api/<CustomerController>
-        [HttpGet(Name = "GetAllValuesRoute")]
+        [HttpGet(Name = "GetAllValuesRoute")] //this can be done via range header as well
         public async Task<ItemsLinkContainer<Customer>> Get([FromQuery] int skip = 0)
         {
             const int pageSize = 5;
@@ -89,7 +88,7 @@ namespace DemoApi.Controllers
         }
 
         // GET api/<CustomerController>/5
-        [HttpGet("{id}", Name = "GetValueByIdRoute")]
+        [HttpGet("{id}", Name = "GetByIdRoute")]
         [Links(Policy = "FullInfoPolicy")]
         public async Task<Customer> Get(Guid id)
         {
@@ -109,20 +108,38 @@ namespace DemoApi.Controllers
             value.Id = Guid.NewGuid();
             await _linkService.AddLinksAsync(value);
 
-            return Accepted(new Uri($"{value.Links["self"].Href}/{value.Id}"));
+            return Accepted(new Uri($"{value.Links["self"].Href}"));
         }
 
-        //// PUT api/<CustomerController>/5
-        //[HttpPut("{id}")]
-        //public void Put(int id, [FromBody] string value)
-        //{
+        [HttpPost("{customerId}/Orders")] //how to add this to links
+        public async Task<IActionResult> PostOrder(
+            [FromRoute] Guid customerId, [FromBody] Order order)
+        {
+            order.ForCustomerId = customerId;
+            await _linkService.AddLinksAsync(order);
+            return Accepted(new Uri($"{order.Links["self"].Href}"));
+        }
 
-        //}
+        [HttpGet("{customerId}/Orders", Name = "GetAllOrdersValuesRoute")]
+        public async Task<ItemsLinkContainer<Order>> GetOrders(Guid customerId)
+        {
+            Fixture f = new Fixture();
 
-        //// DELETE api/<CustomerController>/5
-        //[HttpDelete("{id}")]
-        //public void Delete(int id)
-        //{
-        //}
+            var orders = f.Build<Order>()
+                .With(a => a.ForCustomerId, customerId)
+                .Without(w => w.Links)
+                .CreateMany()
+                .ToList();
+
+            foreach (var order in orders)
+            {
+                await _linkService.AddLinksAsync(order);
+            }
+
+            return new ItemsLinkContainer<Order>
+            {
+                Items = orders
+            };
+        }
     }
 }

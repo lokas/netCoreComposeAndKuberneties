@@ -1,17 +1,30 @@
-﻿using System;
+﻿using RiskFirst.Hateoas.Models;
+using System;
 using System.Collections.Generic;
 
 namespace DemoApi.RestHateos
 {
-    public class Order
+    public class Order : LinkContainer
     {
+        public Order()
+        {
+            Id = Guid.NewGuid();
+            CreateAt = DateTime.Now;
+        }
+
         public Guid Id { get; set; }
         public DateTime CreateAt { get; set; }
-        //todo: zanima me kako ide za order items
-        public List<OrderItems> Items { get; set; } //how to model this madness 
+
+        public Guid ForCustomerId { get; set; }
+        public string OrderName { get; set; }
     }
 
-    public class OrderItems
+    public class OrderDetails : Order
+    {
+        public List<OrderItem> Items { get; set; } //how to model this madness   
+    }
+
+    public class OrderItem : LinkContainer
     {
         public Guid ProductId { get; set; }
         public int Quantity { get; set; }
